@@ -32,6 +32,20 @@ func TemplateActionOperator(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func TemplateActionRange(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./template/range.gohtml"))
+
+	err := t.ExecuteTemplate(w, "range.gohtml", map[string]interface{}{
+		"Title": "Template action comparator",
+		"Hobbies": []string{
+			"Game", "Read", "Code",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
 func TestTemplateActionIf(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
 	recorder := httptest.NewRecorder()
@@ -48,6 +62,17 @@ func TestTemplateActionOperator(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	TemplateActionOperator(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+
+	fmt.Println(string(body))
+}
+
+func TestTemplateActionRange(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateActionRange(recorder, request)
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 
