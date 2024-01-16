@@ -1,6 +1,7 @@
 package go_web
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
 	"io"
@@ -47,6 +48,21 @@ func TemplateDirectory(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//go:embed template/*.gohtml
+var templates embed.FS
+
+func TemplateEmbed(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFS(templates, "template/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+
+	err = t.ExecuteTemplate(w, "test.gohtml", "Go HTML")
+	if err != nil {
+		panic(err)
+	}
+}
+
 func TestSimpleHtml(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
 	recorder := httptest.NewRecorder()
@@ -74,6 +90,17 @@ func TestTemplateDirectory(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	TemplateDirectory(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+
+	fmt.Println(string(body))
+}
+
+func TestTemplateEmbed(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateEmbed(recorder, request)
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 
