@@ -35,6 +35,18 @@ func SimpleHtmlFile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func TemplateDirectory(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseGlob("./template/*.gohtml")
+	if err != nil {
+		panic(err)
+	}
+
+	err = t.ExecuteTemplate(w, "test.gohtml", "Go HTML")
+	if err != nil {
+		panic(err)
+	}
+}
+
 func TestSimpleHtml(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
 	recorder := httptest.NewRecorder()
@@ -51,6 +63,17 @@ func TestSimpleHtmlFile(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	SimpleHtmlFile(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+
+	fmt.Println(string(body))
+}
+
+func TestTemplateDirectory(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateDirectory(recorder, request)
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 
