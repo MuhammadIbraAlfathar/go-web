@@ -11,6 +11,7 @@ import (
 
 type Address struct {
 	Street string
+	City   string
 }
 
 type Page struct {

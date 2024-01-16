@@ -46,6 +46,21 @@ func TemplateActionRange(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func TemplateActionWith(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./template/with.gohtml"))
+
+	err := t.ExecuteTemplate(w, "with.gohtml", Page{
+		Title: "Sebuah Template data struct",
+		Address: Address{
+			Street: "Jl. Kebagusan",
+			City:   "Jakarta Timur",
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
 func TestTemplateActionIf(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
 	recorder := httptest.NewRecorder()
@@ -73,6 +88,17 @@ func TestTemplateActionRange(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	TemplateActionRange(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+
+	fmt.Println(string(body))
+}
+
+func TestTemplateActionWith(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateActionWith(recorder, request)
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 
